@@ -707,6 +707,34 @@ export const socialMediaUpdate = async (req: IRequest, res: Response): Promise<R
   }
 };
 
+export const updateBrandSocialMediaColor = async (
+  req: IRequest,
+  res: Response,
+): Promise<Response> => {
+  // eslint-disable-next-line
+  const body: any = req.body;
+
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+    const { socialMediaColor } = body;
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
+    await Users.findByIdAndUpdate(userId, { socialMediaColor }, { new: true }); // Updating the user
+
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
 export const customeBtnUpdate = async (req: IRequest, res: Response): Promise<Response> => {
   // eslint-disable-next-line
   // const body: any = req.body;
