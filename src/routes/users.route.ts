@@ -23,6 +23,7 @@ import {
   changeStatus,
   updateBrandAnimations,
   updateBrandLayouts,
+  updateBrandSocialMediaColor,
 } from '@controllers/users.controller';
 import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
 import { upload, backgroundUpload } from '@middleware/multer.middleware';
@@ -58,7 +59,6 @@ router.get('/:userId', checkUserAuth, getById); // Get one user by id
 
 // Update
 router.put('/admin', checkAdminAuth, updateAdmin); // Update an admin
-router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by id
 router.put('/brand/description/:userId', checkUserAuth, updateBrandDescription); // Update a specific brand by id
 router.put('/brand/typography/:userId', checkUserAuth, updateBrandTypography); // Update a specific brand by id
 router.put('/brand/animation/:userId', checkUserAuth, updateBrandAnimations); // Update a specific brand by id
@@ -71,10 +71,13 @@ router.put(
 ); // Update a specific brand by id
 
 router.put('/brand/favIcon/:userId', checkUserAuth, upload.single('favIcon'), updateFavIcon); // Update a specific brand by id
+router.patch('/brand/socialMediaColor/:userId', checkUserAuth, updateBrandSocialMediaColor); // Update a specific brand by id
 
 router.put('/brand/socialLinks/:userId', checkUserAuth, socialMediaUpdate); // Update a specific brand by id
 router.put('/brand/customButton/:userId', checkUserAuth, customeBtnUpdate); // Update a specific brand by id
 router.delete('/brand/socialLinks/:userId/:platformId', checkUserAuth, deleteSocialMedia); // Update a specific brand by id
+
+router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by id
 
 router.patch('/change-status/:id', checkAdminAuth, changeStatus); // Deactivate a user
 

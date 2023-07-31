@@ -79,6 +79,7 @@ const userSchema = new Schema(
       border: String,
       color: String,
     },
+    socialMediaColor: String,
     description: { type: String },
     layout: {
       type: String,
