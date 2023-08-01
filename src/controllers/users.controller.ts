@@ -310,6 +310,7 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       description: brand.description ? brand.description : '',
       favIcon: brand.favIcon ? brand.favIcon : '',
       pageAnimation: brand.pageAnimation,
+      socialMediaColor: brand?.socialMediaColor ? brand?.socialMediaColor : ''
     };
     console.log('brandData', brandData);
     return res.json({
