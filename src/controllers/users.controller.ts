@@ -463,6 +463,40 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+export const updateBrandFavicon = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line
+  const body: any = req.body;
+
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    console.log('body fav', body.icon);
+    const existingUser:any= await Users.findById(userId); // Fetching the existing user
+    console.log('existingUser',existingUser.favIcons.length );
+    if(existingUser){
+      // const newUser = existingUser?.favIcons.filter((fav:string)=>fav!==body.icon)
+      // console.log("newuser",newUser.length)
+      existingUser?.favIcons.pop(body.icon)
+      console.log('existingUser2',existingUser.favIcons.length );
+    }
+    
+    // eslint-disable-next-line
+    await Users.findByIdAndUpdate(userId, existingUser, { new: true }); // Updating the user
+
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
 export const updateBrandTypography = async (req: IRequest, res: Response): Promise<Response> => {
   // eslint-disable-next-line
   const body: any = req.body;

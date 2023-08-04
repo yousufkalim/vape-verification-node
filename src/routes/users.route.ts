@@ -12,6 +12,7 @@ import {
   deleteAdmin,
   updateBrand,
   updateBrandDescription,
+  updateBrandFavicon,
   updateBrandTypography,
   updateBrandBackground,
   socialMediaUpdate,
@@ -60,6 +61,7 @@ router.get('/:userId', checkUserAuth, getById); // Get one user by id
 // Update
 router.put('/admin', checkAdminAuth, updateAdmin); // Update an admin
 router.put('/brand/description/:userId', checkUserAuth, updateBrandDescription); // Update a specific brand by id
+router.put('/brand/delfavicon/:userId', checkUserAuth, updateBrandFavicon); // Update a specific brand by id
 router.put('/brand/typography/:userId', checkUserAuth, updateBrandTypography); // Update a specific brand by id
 router.put('/brand/animation/:userId', checkUserAuth, updateBrandAnimations); // Update a specific brand by id
 router.put('/brand/layout/:userId', checkUserAuth, validateLayout, isValidated, updateBrandLayouts); // Update a specific brand by id
