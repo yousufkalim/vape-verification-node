@@ -101,11 +101,12 @@ export const sendOtpCodeEmail = async (
   return await new Promise((resolve, reject) => {
     // Send email options
     const mailOptions = {
-      from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
-      to: email,
-      subject: `VeriScan - Your Verification Code: ${code}`,
-      text: `Hello, \n \n Following a sign-in attempt on your VeriScan account, our two-factor authentication process has been initiated. A unique verification code has been generated for your use. \n \n Verification Code: ${code} \n \n Please enter this code into the appropriate field on the VeriScan platform to continue with your sign-in. \n \n NOTE: This code is solely for your personal use and should not be shared. VeriScan representatives will never ask for this code outside of this automated process. \n \n If this sign-in attempt was not made by you, or if you have any issues or queries, please contact our support team immediately at support@getveriscan.com. \n \n Thank you for helping us to maintain your account's security. \n \n Best regards, \n The VeriScan Team`,
+        from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
+        to: email,
+        subject: `Your Two-Factor Authentication Code`,
+        text: `Hello,\n\nWe noticed a sign-in attempt to your VeriScan account. For added security, please verify this attempt using the code provided below:\n\nVerification Code: ${code}\n\nKey points to remember:\n- This code is valid for 15 minutes. If you need a new code, please initiate the sign-in process again.\n- Never share this code with anyone. VeriScan will never ask for this code outside of our platform.\n- If you didn't request this code or suspect suspicious activity, please contact us immediately at support@getveriscan.com.\n\nThank you for prioritizing security with VeriScan and for taking steps to keep your account safe.\n\nBest regards,\nThe VeriScan Team`,
     };
+
 
     // Sending email
     transporter.sendMail(mailOptions, function (error) {
