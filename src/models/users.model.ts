@@ -78,6 +78,7 @@ const userSchema = new Schema(
       // if type is Outline then bg color is border
       border: String,
       color: String,
+      btnText:String
     },
     socialMediaColor: String,
     description: { type: String },
