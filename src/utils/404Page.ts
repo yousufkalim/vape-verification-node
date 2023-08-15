@@ -10,133 +10,99 @@ const page404 = (path: string): string => {
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>404 HTML Template by Colorlib</title>
+    <title>Oops! Lost in Space</title>
 
     <!-- Google font -->
-    <link
-      href="https://fonts.googleapis.com/css?family=Cabin:400,700"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css?family=Montserrat:900"
-      rel="stylesheet"
-    />
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:900" rel="stylesheet" />
 
     <style>
       * {
-        -webkit-box-sizing: border-box;
         box-sizing: border-box;
       }
 
       body {
         padding: 0;
         margin: 0;
+        font-family: "Cabin", sans-serif;
+        background-color: #DEFCF9;
+        color: #362FD9;
       }
 
       #notfound {
         position: relative;
         height: 100vh;
-      }
-
-      #notfound .notfound {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .notfound {
-        max-width: 520px;
-        width: 100%;
-        line-height: 1.4;
         text-align: center;
+        animation: bounceIn 2s;
       }
 
-      .notfound .notfound-404 {
-        position: relative;
-        height: 240px;
+      @keyframes bounceIn {
+        0% {
+          opacity: 0;
+          transform: translateY(-200px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
-      .notfound .notfound-404 h1 {
-        font-family: 'Montserrat', sans-serif;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-        font-size: 252px;
+      .notfound-404 h1 {
+        font-size: 150px;
+        margin: 0;
         font-weight: 900;
-        margin: 0px;
-        color: #262626;
-        text-transform: uppercase;
-        letter-spacing: -40px;
-        margin-left: -20px;
-      }
-
-      .notfound .notfound-404 h1 > span {
-        text-shadow: -8px 0px 0px #fff;
-      }
-
-      .notfound .notfound-404 h3 {
-        font-family: 'Cabin', sans-serif;
-        position: relative;
-        font-size: 16px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #262626;
-        margin: 0px;
-        letter-spacing: 3px;
-        padding-left: 6px;
+        color: #3C84AB;
       }
 
       .notfound h2 {
-        font-family: 'Cabin', sans-serif;
-        font-size: 20px;
-        font-weight: 400;
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 15px;
         text-transform: uppercase;
-        color: #000;
-        margin-top: 0px;
-        margin-bottom: 25px;
       }
 
       .notfound h2 code {
-        font-family: 'Courier New', monospace;
-        color: #333;
-        background-color: #f9f9f9;
+        font-family: "Courier New", monospace;
+        background-color: #85CDFD;
         padding: 2px 6px;
         border-radius: 3px;
       }
 
+      .notfound a {
+        display: inline-block;
+        padding: 10px 25px;
+        border-radius: 3px;
+        background-color: #362FD9;
+        color: #DEFCF9;
+        text-decoration: none;
+        margin-top: 20px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      .notfound a:hover {
+        background-color: #3C84AB;
+        color: #362FD9;
+      }
+
       @media only screen and (max-width: 767px) {
-        .notfound .notfound-404 {
-          height: 200px;
-        }
-        .notfound .notfound-404 h1 {
-          font-size: 200px;
+        .notfound-404 h1 {
+          font-size: 120px;
         }
       }
 
       @media only screen and (max-width: 480px) {
-        .notfound .notfound-404 {
-          height: 162px;
-        }
-        .notfound .notfound-404 h1 {
-          font-size: 162px;
-          height: 150px;
-          line-height: 162px;
+        .notfound-404 h1 {
+          font-size: 80px;
         }
         .notfound h2 {
-          font-size: 16px;
+          font-size: 18px;
         }
       }
     </style>
@@ -146,10 +112,11 @@ const page404 = (path: string): string => {
     <div id="notfound">
       <div class="notfound">
         <div class="notfound-404">
-          <h3>Oops! Route not found</h3>
-          <h1><span>4</span><span>0</span><span>4</span></h1>
+          <h1>404</h1>
         </div>
-        <h2>we are sorry, but the path <br> <code>${path}</code> <br> was not found</h2>
+        <h2>Oops! We can't find the planet you're looking for.</h2>
+        <h2>Maybe it's in another galaxy or at path: <code>${path}</code></h2>
+        <a href="/">Back to Homebase</a>
       </div>
     </div>
   </body>
