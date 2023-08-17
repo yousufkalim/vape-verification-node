@@ -308,6 +308,7 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       socialMedia: brand.socialMedia ? brand.socialMedia : '',
       customizeButton: brand.customizeButton ? brand.customizeButton : '',
       description: brand.description ? brand.description : '',
+      descriptionColor: brand.descriptionColor ? brand.descriptionColor : '',
       favIcon: brand.favIcon ? brand.favIcon : '',
       pageAnimation: brand.pageAnimation,
       socialMediaColor: brand?.socialMediaColor ? brand?.socialMediaColor : ''
