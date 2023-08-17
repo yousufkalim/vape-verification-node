@@ -82,6 +82,7 @@ const userSchema = new Schema(
     },
     socialMediaColor: String,
     description: { type: String },
+    descriptionColor:{ type: String },
     layout: {
       type: String,
       enum: ['1', '2', '3', '4'],

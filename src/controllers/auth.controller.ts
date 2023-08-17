@@ -258,7 +258,7 @@ export const verifyCode = async (req: Request, res: Response): Promise<Response>
     if (user.code !== code) {
       return res.status(400).json({ success: false, message: 'Invalid code' });
     }
-
+// check code expire after 10 minutes
     const isOTPValid = (updatedAt: string): boolean => {
       const currentTime: Date = new Date();
       const updatedAtTime: Date = new Date(updatedAt);
