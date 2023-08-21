@@ -88,6 +88,16 @@ const userSchema = new Schema(
       enum: ['1', '2', '3', '4'],
       default: '1',
     },
+    emailToggle: {
+      type: Boolean,
+      default:false
+
+    },
+    phoneToggle: {
+      type: Boolean,
+      default:false
+
+    },
     active: {
       type: Boolean,
       required: true,
