@@ -311,7 +311,9 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       descriptionColor: brand.descriptionColor ? brand.descriptionColor : '',
       favIcon: brand.favIcon ? brand.favIcon : '',
       pageAnimation: brand.pageAnimation,
-      socialMediaColor: brand?.socialMediaColor ? brand?.socialMediaColor : ''
+      socialMediaColor: brand?.socialMediaColor ? brand?.socialMediaColor : '',
+      emailToggle: brand?.emailToggle ? brand?.emailToggle : false,
+      phoneToggle: brand?.phoneToggle ? brand?.phoneToggle : false
     };
     console.log('brandData', brandData);
     return res.json({
@@ -612,7 +614,7 @@ export const updateBrandBackground = async (req: IRequest, res: Response): Promi
   };
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
-
+console.log("body is ",body)
     if (req.user?.role === 'brand' && userId !== req.user._id) {
       return res
         .status(401)
