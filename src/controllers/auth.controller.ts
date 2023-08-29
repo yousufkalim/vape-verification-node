@@ -256,7 +256,7 @@ export const verifyCode = async (req: Request, res: Response): Promise<Response>
       return res.status(404).json({ success: false, message: 'User not found' });
     }
     if (user.code !== code) {
-      return res.status(400).json({ success: false, message: 'Invalid code' });
+      return res.status(400).json({ success: false, message: 'The code you entered was invalid' });
     }
 // check code expire after 10 minutes
     const isOTPValid = (updatedAt: string): boolean => {
@@ -270,7 +270,7 @@ export const verifyCode = async (req: Request, res: Response): Promise<Response>
       console.log('aaaaa');
       return res
         .status(400)
-        .json({ success: false, message: 'Your OTP has been expired, please resend.' });
+        .json({ success: false, message: 'Your code has expired. Please request a new one.' });
     }
 
     // Creating payload with user object
