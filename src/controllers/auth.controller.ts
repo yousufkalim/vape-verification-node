@@ -29,7 +29,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
 
     if (!user) {
       // If user not found
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(401).json({ success: false, message: 'Invalid credential' });
     }
 
     if (!user.password || !user.active) {
@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
 
     if (!isMatched) {
       // If password not matched
-      return res.status(400).json({ success: false, message: 'Invalid Password' });
+      return res.status(401).json({ success: false, message: 'Invalid credential' });
     }
     if (req.body.twoFactor as boolean) {
       // Creating payload with user object
@@ -98,8 +98,8 @@ export const resendCode = async (req: Request, res: Response): Promise<Response>
     const user = await Users.findOne({ email }).select('+code');
 
     if (!user) {
-      // If user not found
-      return res.status(404).json({ success: false, message: 'User not found' });
+      // If Invalid credential
+      return res.status(404).json({ success: false, message: 'Invalid credential' });
     }
 
     const otp = await otpGenerator.generate(6, {
