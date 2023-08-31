@@ -96,7 +96,20 @@ const userSchema = new Schema(
     phoneToggle: {
       type: Boolean,
       default:false
-
+    },
+    emailRequire: {
+      type: Boolean,
+      default:false
+    },
+    phoneRequire: {
+      type: Boolean,
+      default:false
+    },
+    emailPlaceholder: {
+      type: String,
+    },
+    phonePlaceholder: {
+      type: String,
     },
     active: {
       type: Boolean,
