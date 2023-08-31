@@ -313,7 +313,12 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       pageAnimation: brand.pageAnimation,
       socialMediaColor: brand?.socialMediaColor ? brand?.socialMediaColor : '',
       emailToggle: brand?.emailToggle ? brand?.emailToggle : false,
-      phoneToggle: brand?.phoneToggle ? brand?.phoneToggle : false
+      phoneToggle: brand?.phoneToggle ? brand?.phoneToggle : false,
+      emailRequire: brand?.emailRequire ? brand?.emailRequire : false,
+      phoneRequire: brand?.phoneRequire ? brand?.phoneRequire : false,
+      emailPlaceholder: brand?.emailPlaceholder ? brand?.emailPlaceholder : '',
+      phonePlaceholder: brand?.phonePlaceholder ? brand?.phonePlaceholder : ''
+
     };
     console.log('brandData', brandData);
     return res.json({
