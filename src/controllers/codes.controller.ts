@@ -8,8 +8,6 @@ import InvalidAttempts from '@models/invalidAttempts.model';
 import IRequest from '@interfaces/request.interface';
 
 import BrandFeedback from '@models/brandFeedback';
-
-import ICode from '@interfaces/codes.interface';
 import { getLocationByIP } from '@/utils/common';
 
 /**
@@ -60,76 +58,89 @@ export const getCodes = async (req: IRequest, res: Response): Promise<Response> 
 export const getUserLocations = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const { brandId } = req.params;
-    const codes: ICode[] = await Codes.find({ brand: brandId, scan_attempts: { $gt: 0 } });
-    const repeatedAttempts = codes?.map((item) =>
-      item?.repeated_attempts?.map((a) => {
-        const { timestamp, ip_address: ipAddress, lat, long, city, country, zip, region } = a;
-        return {
-          code: item.code,
-          batch: item.request_name,
-          timestamp,
-          ipAddress,
-          lat,
-          long,
-          city,
-          country,
-          zip,
-          region,
-        };
-      }),
-    );
-    console.log('repeatedAttempts', repeatedAttempts);
-    const locations = repeatedAttempts.flat();
-    console.log('locations', locations);
 
-    // Get valid locations
-    const validData = [];
-    for (const code of codes) {
-      if (code?.valid_attempt_location?.lat) {
-        validData.push({
-          ...code.valid_attempt_location,
-          timestamp: code.validation_time,
-          batch: code.request_name,
-          code: code.code,
-        });
-      }
-    }
+    const validCodes = await Codes.aggregate([
+      {
+        $match: {
+          'valid_attempt_location.region': {
+            $ne: null,
+          },
+          brand: brandId,
+        },
+      },
+      {
+        $group: {
+          _id: '$valid_attempt_location.region',
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          regions: {
+            $addToSet: {
+              k: '$_id',
+              v: '$count',
+            },
+          },
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $arrayToObject: '$regions',
+          },
+        },
+      },
+    ]);
 
-    const invalidAttempt = await InvalidAttempts.find();
+    const repeatedCodes = await Codes.aggregate([
+      {
+        $match: {
+          'repeated_attempts.region': {
+            $ne: null,
+          },
+          brand: brandId,
+        },
+      },
+      {
+        $unwind: '$repeated_attempts',
+      },
+      {
+        $group: {
+          _id: '$repeated_attempts.region',
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          regions: {
+            $addToSet: {
+              k: '$_id',
+              v: '$count',
+            },
+          },
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $arrayToObject: '$regions',
+          },
+        },
+      },
+    ]);
 
-    const invalidLocations = invalidAttempt?.map((item: any) => ({
-      code: item?.code,
-      timestamp: item?.updatedAt,
-      ipAddress: item?.location?.ip_address,
-      lat: item?.location?.lat,
-      long: item?.location?.long,
-      city: item?.location?.city,
-      country: item?.location?.country,
-      zip: item?.location?.zip,
-      region: item?.location?.region,
-      name: item?.location.city,
-      latLng: [item?.location?.lat, item?.location?.long],
-      color: '#FF0000',
-      status: 'invalid_attempt',
-    }));
-    const repeatedLocations = locations?.map((item) => ({
-      ...item,
-      name: item?.city,
-      latLng: [item?.lat, item?.long],
-      color: '#FFA500',
-      status: 'repeated',
-    }));
-
-    const validLocations = validData?.map((item) => ({
-      ...item,
-      latLng: [item?.lat, item?.long],
-      name: item?.city,
-      color: '#00ff00',
-      status: 'valid',
-    }));
     return res.json({
       success: true,
-      data: { locations: [...validLocations, ...repeatedLocations,...invalidLocations] },
+      validCodes: validCodes[0],
+      invalidCodes: [{}],
+      repeatedCodes: repeatedCodes[0],
     });
   } catch (err) {
     // Error handling
@@ -146,80 +157,125 @@ export const getUserLocations = async (req: IRequest, res: Response): Promise<Re
  */
 export const getAllLocations = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
-    console.log('0');
-    // await Codes.collection.createIndex({ scan_attempts: 1 }, { background: true });
-    // const query = Codes.find({ scan_attempts: { $gt: 0 } });
-    // const executionDetails = await query.explain('executionStats').exec();
+    const validCodes = await Codes.aggregate([
+      {
+        $match: {
+          'valid_attempt_location.region': {
+            $ne: null,
+          },
+          'valid_attempt_location.country': 'United States',
+        },
+      },
+      {
+        $group: {
+          _id: '$valid_attempt_location.region',
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          regions: {
+            $addToSet: {
+              k: '$_id',
+              v: '$count',
+            },
+          },
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $arrayToObject: '$regions',
+          },
+        },
+      },
+    ]);
 
-    const codes: ICode[] = await Codes.find({ scan_attempts: { $gt: 0 } });
-    console.log('1', codes);
-    const repeatedAttempts = codes?.map((item) =>
-      item?.repeated_attempts?.map((a) => {
-        const { timestamp, ip_address: ipAddress, lat, long, city, country, zip, region } = a;
-        return {
-          code: item.code,
-          batch: item.request_name,
-          timestamp,
-          ipAddress,
-          lat,
-          long,
-          city,
-          country,
-          zip,
-          region,
-        };
-      }),
-    );
-    const locations = repeatedAttempts.flat();
+    const repeatedCodes = await Codes.aggregate([
+      {
+        $match: {
+          'repeated_attempts.region': {
+            $ne: null,
+          },
+          'repeated_attempts.country': 'United States',
+        },
+      },
+      {
+        $unwind: '$repeated_attempts',
+      },
+      {
+        $group: {
+          _id: '$repeated_attempts.region',
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          regions: {
+            $addToSet: {
+              k: '$_id',
+              v: '$count',
+            },
+          },
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $arrayToObject: '$regions',
+          },
+        },
+      },
+    ]);
 
-    // Get valid locations
-    const validData = [];
-    for (const code of codes) {
-      if (code?.valid_attempt_location?.lat) {
-        validData.push({
-          ...code.valid_attempt_location,
-          timestamp: code.validation_time,
-          batch: code.request_name,
-          code: code.code,
-          ipAddress: code.ip_address,
-        });
-      }
-    }
-    const invalidAttempt = await InvalidAttempts.find();
+    const invalidCodes = await InvalidAttempts.aggregate([
+      {
+        $match: {
+          'location.region': {
+            $ne: null,
+          },
+          'location.country': 'United States',
+        },
+      },
+      {
+        $group: {
+          _id: '$location.region',
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          regions: {
+            $addToSet: {
+              k: '$_id',
+              v: '$count',
+            },
+          },
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $arrayToObject: '$regions',
+          },
+        },
+      },
+    ]);
 
-    const invalidLocations = invalidAttempt?.map((item: any) => ({
-      code: item?.code,
-      timestamp: item?.updatedAt,
-      ipAddress: item?.location?.ip_address,
-      lat: item?.location?.lat,
-      long: item?.location?.long,
-      city: item?.location?.city,
-      country: item?.location?.country,
-      zip: item?.location?.zip,
-      region: item?.location?.region,
-      name: item?.location.city,
-      latLng: [item?.location?.lat, item?.location?.long],
-      color: '#FF0000',
-      status: 'invalid_attempt',
-    }));
-
-    const repeatedLocations = locations?.map((item) => ({
-      ...item,
-      name: item?.city,
-      latLng: [item?.lat, item?.long],
-      color: '#FFA500',
-      status: 'repeated',
-    }));
-    const validLocations = validData?.map((item) => ({
-      ...item,
-      latLng: [item?.lat, item?.long],
-      name: item?.city,
-      color: '#00ff00',
-      status: 'valid',
-    }));
     return res.json({
       success: true,
-      data: { locations: [...validLocations, ...repeatedLocations, ...invalidLocations] },
+      validCodes: validCodes[0],
+      invalidCodes: invalidCodes[0],
+      repeatedCodes: repeatedCodes[0],
     });
   } catch (err) {
     // Error handling
