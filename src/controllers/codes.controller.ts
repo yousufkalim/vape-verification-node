@@ -6,6 +6,7 @@ import { Response, Request } from 'express';
 import Codes from '@models/codes.model';
 import InvalidAttempts from '@models/invalidAttempts.model';
 import IRequest from '@interfaces/request.interface';
+import mongoose from 'mongoose';
 
 import BrandFeedback from '@models/brandFeedback';
 import { getLocationByIP } from '@/utils/common';
@@ -66,7 +67,7 @@ export const getUserLocations = async (req: Request, res: Response): Promise<Res
             'valid_attempt_location.region': {
               $ne: null,
             },
-            brand: brandId,
+            brand: new mongoose.Types.ObjectId(brandId),
           },
         },
         {
@@ -102,7 +103,7 @@ export const getUserLocations = async (req: Request, res: Response): Promise<Res
             'repeated_attempts.region': {
               $ne: null,
             },
-            brand: brandId,
+            brand: new mongoose.Types.ObjectId(brandId),
           },
         },
         {
