@@ -2,7 +2,7 @@
  * Code controllers
  * @author Yousuf Kalim
  */
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import Codes from '@models/codes.model';
 import InvalidAttempts from '@models/invalidAttempts.model';
 import IRequest from '@interfaces/request.interface';
@@ -55,92 +55,93 @@ export const getCodes = async (req: IRequest, res: Response): Promise<Response> 
  * @param {object} req
  * @param {object} res
  */
-export const getUserLocations = async (req: IRequest, res: Response): Promise<Response> => {
+export const getUserLocations = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { brandId } = req.params;
 
-    const validCodes = await Codes.aggregate([
-      {
-        $match: {
-          'valid_attempt_location.region': {
-            $ne: null,
-          },
-          brand: brandId,
-        },
-      },
-      {
-        $group: {
-          _id: '$valid_attempt_location.region',
-          count: {
-            $sum: 1,
+    const [validCodes, repeatedCodes] = await Promise.all([
+      Codes.aggregate([
+        {
+          $match: {
+            'valid_attempt_location.region': {
+              $ne: null,
+            },
+            brand: brandId,
           },
         },
-      },
-      {
-        $group: {
-          _id: null,
-          regions: {
-            $addToSet: {
-              k: '$_id',
-              v: '$count',
+        {
+          $group: {
+            _id: '$valid_attempt_location.region',
+            count: {
+              $sum: 1,
             },
           },
         },
-      },
-      {
-        $replaceRoot: {
-          newRoot: {
-            $arrayToObject: '$regions',
-          },
-        },
-      },
-    ]);
-
-    const repeatedCodes = await Codes.aggregate([
-      {
-        $match: {
-          'repeated_attempts.region': {
-            $ne: null,
-          },
-          brand: brandId,
-        },
-      },
-      {
-        $unwind: '$repeated_attempts',
-      },
-      {
-        $group: {
-          _id: '$repeated_attempts.region',
-          count: {
-            $sum: 1,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          regions: {
-            $addToSet: {
-              k: '$_id',
-              v: '$count',
+        {
+          $group: {
+            _id: null,
+            regions: {
+              $addToSet: {
+                k: '$_id',
+                v: '$count',
+              },
             },
           },
         },
-      },
-      {
-        $replaceRoot: {
-          newRoot: {
-            $arrayToObject: '$regions',
+        {
+          $replaceRoot: {
+            newRoot: {
+              $arrayToObject: '$regions',
+            },
           },
         },
-      },
+      ]),
+      Codes.aggregate([
+        {
+          $match: {
+            'repeated_attempts.region': {
+              $ne: null,
+            },
+            brand: brandId,
+          },
+        },
+        {
+          $unwind: '$repeated_attempts',
+        },
+        {
+          $group: {
+            _id: '$repeated_attempts.region',
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            regions: {
+              $addToSet: {
+                k: '$_id',
+                v: '$count',
+              },
+            },
+          },
+        },
+        {
+          $replaceRoot: {
+            newRoot: {
+              $arrayToObject: '$regions',
+            },
+          },
+        },
+      ]),
     ]);
 
     return res.json({
       success: true,
-      validCodes: validCodes[0],
+      validCodes: validCodes[0] || [{}],
       invalidCodes: [{}],
-      repeatedCodes: repeatedCodes[0],
+      repeatedCodes: repeatedCodes[0] || [{}],
     });
   } catch (err) {
     // Error handling
@@ -155,127 +156,127 @@ export const getUserLocations = async (req: IRequest, res: Response): Promise<Re
  * @param {object} req
  * @param {object} res
  */
-export const getAllLocations = async (_req: IRequest, res: Response): Promise<Response> => {
+export const getAllLocations = async (_req: Request, res: Response): Promise<Response> => {
   try {
-    const validCodes = await Codes.aggregate([
-      {
-        $match: {
-          'valid_attempt_location.region': {
-            $ne: null,
-          },
-          'valid_attempt_location.country': 'United States',
-        },
-      },
-      {
-        $group: {
-          _id: '$valid_attempt_location.region',
-          count: {
-            $sum: 1,
+    const [validCodes, repeatedCodes, invalidCodes] = await Promise.all([
+      Codes.aggregate([
+        {
+          $match: {
+            'valid_attempt_location.region': {
+              $ne: null,
+            },
+            'valid_attempt_location.country': 'United States',
           },
         },
-      },
-      {
-        $group: {
-          _id: null,
-          regions: {
-            $addToSet: {
-              k: '$_id',
-              v: '$count',
+        {
+          $group: {
+            _id: '$valid_attempt_location.region',
+            count: {
+              $sum: 1,
             },
           },
         },
-      },
-      {
-        $replaceRoot: {
-          newRoot: {
-            $arrayToObject: '$regions',
-          },
-        },
-      },
-    ]);
-
-    const repeatedCodes = await Codes.aggregate([
-      {
-        $match: {
-          'repeated_attempts.region': {
-            $ne: null,
-          },
-          'repeated_attempts.country': 'United States',
-        },
-      },
-      {
-        $unwind: '$repeated_attempts',
-      },
-      {
-        $group: {
-          _id: '$repeated_attempts.region',
-          count: {
-            $sum: 1,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          regions: {
-            $addToSet: {
-              k: '$_id',
-              v: '$count',
+        {
+          $group: {
+            _id: null,
+            regions: {
+              $addToSet: {
+                k: '$_id',
+                v: '$count',
+              },
             },
           },
         },
-      },
-      {
-        $replaceRoot: {
-          newRoot: {
-            $arrayToObject: '$regions',
-          },
-        },
-      },
-    ]);
-
-    const invalidCodes = await InvalidAttempts.aggregate([
-      {
-        $match: {
-          'location.region': {
-            $ne: null,
-          },
-          'location.country': 'United States',
-        },
-      },
-      {
-        $group: {
-          _id: '$location.region',
-          count: {
-            $sum: 1,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          regions: {
-            $addToSet: {
-              k: '$_id',
-              v: '$count',
+        {
+          $replaceRoot: {
+            newRoot: {
+              $arrayToObject: '$regions',
             },
           },
         },
-      },
-      {
-        $replaceRoot: {
-          newRoot: {
-            $arrayToObject: '$regions',
+      ]),
+      Codes.aggregate([
+        {
+          $match: {
+            'repeated_attempts.region': {
+              $ne: null,
+            },
+            'repeated_attempts.country': 'United States',
           },
         },
-      },
+        {
+          $unwind: '$repeated_attempts',
+        },
+        {
+          $group: {
+            _id: '$repeated_attempts.region',
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            regions: {
+              $addToSet: {
+                k: '$_id',
+                v: '$count',
+              },
+            },
+          },
+        },
+        {
+          $replaceRoot: {
+            newRoot: {
+              $arrayToObject: '$regions',
+            },
+          },
+        },
+      ]),
+      InvalidAttempts.aggregate([
+        {
+          $match: {
+            'location.region': {
+              $ne: null,
+            },
+            'location.country': 'United States',
+          },
+        },
+        {
+          $group: {
+            _id: '$location.region',
+            count: {
+              $sum: 1,
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            regions: {
+              $addToSet: {
+                k: '$_id',
+                v: '$count',
+              },
+            },
+          },
+        },
+        {
+          $replaceRoot: {
+            newRoot: {
+              $arrayToObject: '$regions',
+            },
+          },
+        },
+      ]),
     ]);
 
     return res.json({
       success: true,
-      validCodes: validCodes[0],
-      invalidCodes: invalidCodes[0],
-      repeatedCodes: repeatedCodes[0],
+      validCodes: validCodes[0] || [{}],
+      invalidCodes: invalidCodes[0] || [{}],
+      repeatedCodes: repeatedCodes[0] || [{}],
     });
   } catch (err) {
     // Error handling
